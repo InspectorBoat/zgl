@@ -654,12 +654,12 @@ pub fn bufferSubData(target: BufferTarget, offset: usize, comptime T: type, item
     checkError();
 }
 
-pub fn bindBufferBase(target: BufferTarget, index: u32, buffer: types.Buffer) void {
+pub fn bindBufferBase(buffer: types.Buffer, target: BufferTarget, index: u32) void {
     binding.bindBufferBase(@intFromEnum(target), index, @intFromEnum(buffer));
     checkError();
 }
 
-pub fn bindBufferRange(target: BufferTarget, index: u32, buffer: types.Buffer, offset: u32, size: u32) void {
+pub fn bindBufferRange(buffer: types.Buffer, target: BufferTarget, index: u32, offset: u32, size: u32) void {
     binding.bindBufferRange(@intFromEnum(target), index, @intFromEnum(buffer), offset, size);
     checkError();
 }
