@@ -38,7 +38,7 @@ Then import it with `const gl = @import("zgl");`, and build as normal with `zig 
 
 This library is developed incrementally. That means that functions and other things will be included on-demand and not just for the sake of completeness.
 
-If you think a function is missing, fork the library, implement the missing function similar to the other functions and make a pull request. Issues that request implementation of missing functions will be closed immediatly.
+If you think a function is missing, fork the library, implement the missing function similar to the other functions and make a pull request. Issues that request implementation of missing functions will be closed immediately.
 
 ## Generated Bindings
 
