@@ -7,7 +7,37 @@ comptime {
 }
 
 const types = @import("types.zig");
-pub usingnamespace types;
+pub const Boolean = types.Boolean;
+pub const Byte = types.Byte;
+pub const UByte = types.UByte;
+pub const Char = types.Char;
+pub const Short = types.Short;
+pub const UShort = types.UShort;
+pub const Int = types.Int;
+pub const UInt = types.UInt;
+pub const Fixed = types.Fixed;
+pub const Int64 = types.Int64;
+pub const UInt64 = types.UInt64;
+pub const SizeI = types.SizeI;
+pub const Enum = types.Enum;
+pub const IntPtr = types.IntPtr;
+pub const SizeIPtr = types.SizeIPtr;
+pub const Sync = types.Sync;
+pub const BitField = types.BitField;
+pub const Half = types.Half;
+pub const Float = types.Float;
+pub const ClampF = types.ClampF;
+pub const Double = types.Double;
+pub const ClampD = types.ClampD;
+pub const VertexArray = types.VertexArray;
+pub const Buffer = types.Buffer;
+pub const Shader = types.Shader;
+pub const Program = types.Program;
+pub const ProgramPipeline = types.ProgramPipeline;
+pub const Texture = types.Texture;
+pub const Sampler = types.Sampler;
+pub const Renderbuffer = types.Renderbuffer;
+pub const Framebuffer = types.Framebuffer;
 
 pub const ErrorHandling = enum {
     /// OpenGL functions will log the error, but will not assert that no error happened
@@ -195,7 +225,7 @@ pub fn debugMessageCallback(context: anytype, comptime handler: DebugMessageCall
             length: types.SizeI,
             c_message: [*c]const types.Char,
             userParam: ?*const anyopaque,
-        ) callconv(.C) void {
+        ) callconv(.c) void {
             const debug_source = translateSource(c_source);
             const msg_type = translateMessageType(c_msg_type);
             const severity = translateSeverity(c_severity);
@@ -350,6 +380,11 @@ pub fn enableVertexAttribArray(index: u32) void {
 
 pub fn vertexAttribDivisor(index: u32, divisor: u32) void {
     binding.vertexAttribDivisor(index, divisor);
+    checkError();
+}
+
+pub fn vertexArrayBindingDivisor(vertexArray: types.VertexArray, index: u32, divisor: u32) void {
+    binding.vertexArrayBindingDivisor(@intFromEnum(vertexArray), index, divisor);
     checkError();
 }
 
@@ -2218,6 +2253,42 @@ pub fn bindImageTexture(
         @intFromEnum(access),
         @intFromEnum(format),
     );
+    checkError();
+}
+
+pub fn createSampler() types.Sampler {
+    var sampler_name: types.UInt = undefined;
+
+    binding.createSamplers(1, &sampler_name);
+    checkError();
+
+    const sampler = @as(types.Sampler, @enumFromInt(sampler_name));
+    if (sampler == .invalid) {
+        checkError();
+        unreachable;
+    }
+    return sampler;
+}
+
+pub fn deleteSampler(sampler: types.Sampler) void {
+    var id = @intFromEnum(sampler);
+    binding.deleteSamplers(1, &id);
+}
+
+pub fn samplerParameter(sampler: types.Sampler, comptime parameter: TextureParameter, value: TextureParameterType(parameter)) void {
+    const T = TextureParameterType(parameter);
+    const info = @typeInfo(T);
+
+    if (info == .@"enum") {
+        binding.samplerParameteri(@intFromEnum(sampler), @intFromEnum(parameter), @intFromEnum(value));
+    } else {
+        @compileError(@tagName(info) ++ " is not supported yet by samplerParameter");
+    }
+    checkError();
+}
+
+pub fn bindSampler(sampler: types.Sampler, unit: u32) void {
+    binding.bindSampler(unit, @intFromEnum(sampler));
     checkError();
 }
 
